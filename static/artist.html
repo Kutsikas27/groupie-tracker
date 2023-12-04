@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/images/favi.ico" />
+    <title>Groupie-tracker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+    <script defer src="index.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col">col1</div>
+        <div class="col-md-8 col-sm-12">
+          <div class="container">
+            <div class="row">
+              <img class="img-thumbnail col" src="{{.Artist.Image}}" alt="" />
+              <div class="col">
+                <h1>{{.Artist.Name}}</h1>
+                <p>Started activity {{.Artist.CreationDate}}</p>
+                <p>First album release {{.Artist.FirstAlbum}}</p>
+                <p>
+                  Member(s) {{range $index,$member := .Artist.Members}}{{if
+                  $index}}, {{end}}{{ $member }}{{end}}
+                </p>
+              </div>
+            </div>
+          </div>
+          <h2>Concert Dates and Locations:</h2>
+          <ul>
+            {{range $date, $locations := .DatesLocations}}
+            <li>
+              {{$date}} {{range $location := $locations}}{{$location}}, {{end}}
+            </li>
+            {{end}}
+          </ul>
+        </div>
+        <div class="col">col2</div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .col-md-8 {
+        padding: 16px;
+        background: rgb(1, 3, 3);
+        background: linear-gradient(0deg, #131614 50%, rgb(227, 123, 166) 100%);
+        color: white;
+        box-shadow: 1px 1px 20px 1px black;
+        border-radius: 8px;
+        height: 100vh;
+        margin: 1em;
+      }
+      html,
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #131614;
+        background-repeat: no-repeat;
+      }
+      h1 {
+        font-weight: 900;
+      }
+      .img-thumbnail {
+        padding: 0rem;
+        border: 0rem;
+        max-height: 250px;
+        max-width: 250px;
+      }
+    </style>
+  </body>
+</html>
