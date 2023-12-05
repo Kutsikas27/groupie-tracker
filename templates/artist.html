@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="/images/favi.ico" />
+
     <title>Groupie-tracker</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
@@ -23,7 +23,7 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col">col1</div>
+        <div class="col"></div>
         <div class="col-md-8 col-sm-12">
           <div class="container">
             <div class="row">
@@ -39,16 +39,27 @@
               </div>
             </div>
           </div>
-          <h2>Concert Dates and Locations:</h2>
-          <ul>
-            {{range $date, $locations := .DatesLocations}}
-            <li>
-              {{$date}} {{range $location := $locations}}{{$location}}, {{end}}
-            </li>
-            {{end}}
-          </ul>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col" class="align-middle">Date</th>
+                <th scope="col" colspan="2" class="text-right">Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .Concerts}}
+              <tr>
+                <td class="align-middle">{{.Date}}</td>
+                <td colspan="2" class="text-right">
+                  {{.Location.City}} <br />
+                  <div class="country">{{.Location.Country}}</div>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
         </div>
-        <div class="col">col2</div>
+        <div class="col"></div>
       </div>
     </div>
     <script
@@ -60,11 +71,12 @@
       .col-md-8 {
         padding: 16px;
         background: rgb(1, 3, 3);
-        background: linear-gradient(0deg, #131614 50%, rgb(227, 123, 166) 100%);
+        background: linear-gradient(0deg, #131614 65%, rgb(227, 123, 166) 100%);
         color: white;
         box-shadow: 1px 1px 20px 1px black;
         border-radius: 8px;
-        height: 100vh;
+        min-height: 100vh;
+        height: 100%;
         margin: 1em;
       }
       html,
@@ -72,6 +84,7 @@
         font-family: "Poppins", sans-serif;
         background: #131614;
         background-repeat: no-repeat;
+        color: white;
       }
       h1 {
         font-weight: 900;
@@ -81,6 +94,17 @@
         border: 0rem;
         max-height: 250px;
         max-width: 250px;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+      .country {
+        font-size: medium;
+        color: rgb(162, 162, 162);
+      }
+      tr {
+        color: whitesmoke;
       }
     </style>
   </body>
