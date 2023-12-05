@@ -60,7 +60,8 @@ func (c ConcertByDate) Less(other ConcertByDate) bool {
 
 func main() {
 	fileServer := http.FileServer(http.Dir("./images"))
-	http.Handle("/images", fileServer)
+	http.Handle("/images/", http.StripPrefix("/images/", fileServer))
+
 	http.HandleFunc("/artist/", artistPageHandler)
 	http.HandleFunc("/", mainPageHandler)
 	fmt.Printf("Starting server at port 8080\n")
