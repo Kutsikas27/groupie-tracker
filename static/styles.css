@@ -80,6 +80,8 @@ td {
   box-shadow: 1px 1px 20px 1px rgb(251, 82, 152);
   margin: 1em;
   border-radius: 8px;
+  transform: scale(1.05);
+  transition: all 0.5s;
 }
 a {
   text-decoration: none;
