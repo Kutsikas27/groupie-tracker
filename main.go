@@ -42,8 +42,8 @@ func (c ConcertByDate) Less(other ConcertByDate) bool {
 }
 
 func main() {
-	fileServer := http.FileServer(http.Dir("./images"))
-	http.Handle("/images/", http.StripPrefix("/images/", fileServer))
+	fileServer := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
 	http.HandleFunc("/artist/", artistPageHandler)
 	http.HandleFunc("/", mainPageHandler)
