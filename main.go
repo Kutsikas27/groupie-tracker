@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"groupie-tracker/services"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -12,22 +11,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-type Body struct {
-	Index []struct {
-		ID      int                 `json:"id"`
-		Concert map[string][]string `json:"datesLocations"`
-	} `json:"index"`
-}
-
-type Artist struct {
-	Name         string   `json:"name"`
-	Image        string   `json:"image"`
-	FirstAlbum   string   `json:"firstAlbum"`
-	Id           int      `json:"id"`
-	CreationDate int      `json:"creationDate"`
-	Members      []string `json:"members"`
-}
 
 type ConcertByDate struct {
 	Date     string
@@ -70,27 +53,35 @@ func main() {
 func artistPageHandler(w http.ResponseWriter, r *http.Request) {
 	page := r.URL.Path[1:]
 	id, _ := strconv.Atoi(path.Base(page))
-	artists, _ := fetchArtists()
+	artists, _ := services.FetchArtists()
 	artist, _ := findArtistByID(artists, id)
-	locationAndDate, _ := getConcertData()
-	locationById, _ := findConcertDataByID(locationAndDate, id)
 
-	if err := renderArtistPage(w, artist, locationById); err != nil {
+	locationAndDate, _ := services.GetConcertData()
+	locationById, _ := findConcertDataByID(locationAndDate, id)
+	data := struct {
+		Artist   services.Artist
+		Concerts []ConcertByDate
+	}{
+		Artist:   artist,
+		Concerts: locationById,
+	}
+
+	if err := renderPage(w, data, "./templates/artist.html"); err != nil {
 		http.Error(w, fmt.Sprintf("Error rendering HTML: %s", err), http.StatusInternalServerError)
 
 	}
 }
 
-func findArtistByID(artists []Artist, id int) (Artist, error) {
+func findArtistByID(artists []services.Artist, id int) (services.Artist, error) {
 	for _, artist := range artists {
 		if artist.Id == id {
 			return artist, nil
 		}
 	}
-	return Artist{}, fmt.Errorf("Artist with Id %d not found", id)
+	return services.Artist{}, fmt.Errorf("artist with id %d not found", id)
 }
 
-func findConcertDataByID(concertData Body, id int) ([]ConcertByDate, error) {
+func findConcertDataByID(concertData services.Body, id int) ([]ConcertByDate, error) {
 	for _, entry := range concertData.Index {
 		if entry.ID == id {
 			var concerts []ConcertByDate
@@ -140,76 +131,23 @@ func normlizeString(str string) string {
 	splitStr := strings.Split(str, "_")
 	return strings.Join(splitStr, " ")
 }
-func renderArtistPage(w http.ResponseWriter, artist Artist, concertData []ConcertByDate) error {
-	data := struct {
-		Artist   Artist
-		Concerts []ConcertByDate
-	}{
-		Artist:   artist,
-		Concerts: concertData,
-	}
 
-	htmlTemplate, err := template.ParseFiles("./templates/artist.html")
+func renderPage(w http.ResponseWriter, data interface{}, templatePath string) error {
+	htmlTemplate, err := template.ParseFiles(templatePath)
 	if err != nil {
 		return err
 	}
-
 	return htmlTemplate.Execute(w, data)
 }
 
 func mainPageHandler(w http.ResponseWriter, r *http.Request) {
-	artists, err := fetchArtists()
+	artists, err := services.FetchArtists()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching artists: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	if err := renderMainPage(w, artists); err != nil {
+	if err := renderPage(w, artists, "./templates/index.html"); err != nil {
 		http.Error(w, fmt.Sprintf("Error rendering HTML: %s", err), http.StatusInternalServerError)
 	}
-}
-
-func fetchArtists() ([]Artist, error) {
-	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var artists []Artist
-	err = json.Unmarshal(body, &artists)
-	return artists, err
-}
-
-func renderMainPage(w http.ResponseWriter, artists []Artist) error {
-	htmlTemplate, err := template.ParseFiles("./templates/index.html")
-	if err != nil {
-		return err
-	}
-
-	return htmlTemplate.Execute(w, artists)
-}
-func getConcertData() (Body, error) {
-
-	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/relation")
-	if err != nil {
-		return Body{}, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return Body{}, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
-	}
-
-	var concertData Body
-	err = json.NewDecoder(resp.Body).Decode(&concertData)
-	if err != nil {
-		return Body{}, err
-	}
-
-	return concertData, nil
 }
