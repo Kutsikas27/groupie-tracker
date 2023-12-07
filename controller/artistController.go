@@ -18,7 +18,7 @@ func ArtistPageHandler(w http.ResponseWriter, r *http.Request) {
 	artist, _ := service.FindArtistByID(artists, id)
 
 	locationAndDate, _ := repository.GetConcertData()
-	locationById, _ := service.FindConcertDataByID(locationAndDate, id)
+	locationById, _ := service.FindConcertsByID(locationAndDate, id)
 	data := struct {
 		Artist   model.Artist
 		Concerts []model.Concert
