@@ -38,6 +38,11 @@ tr {
 td {
   border-bottom: none;
 }
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: white;
+  border-color: gray;
+}
 .collapse {
   justify-content: flex-end;
 }
@@ -85,4 +90,7 @@ td {
 }
 a {
   text-decoration: none;
+}
+tbody tr:hover {
+  background: #9a9a9a22;
 }
